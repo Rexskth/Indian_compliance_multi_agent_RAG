@@ -1,0 +1,124 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from typing import Dict, Any, List, Optional
+from backend.agents.legal_agent import LegalAgent
+from backend.agents.risk_agent import RiskAgent
+from backend.agents.citation_validator import CitationValidator
+from backend.retrieval.hybrid_retriever import RetrievalResult
+
+
+class QueryIntent:
+    LEGAL = "legal"
+    RISK = "risk"
+    GENERAL = "general"
+    COMPLIANCE = "compliance"
+
+
+class Orchestrator:
+    def __init__(self):
+        self.legal_agent = LegalAgent()
+        self.risk_agent = RiskAgent()
+        self.citation_validator = CitationValidator()
+
+    def classify_intent(self, query: str) -> str:
+        query_lower = query.lower()
+
+        risk_keywords = ["risk", "penalty", "fine", "punishment", "imprisonment", "jail", "offense", "violation", "non-compliance", "penal consequences"]
+        compliance_keywords = ["compliance", "compliant", "requirement", "obligation", "must", "should", "need to", "mandatory"]
+
+        if any(kw in query_lower for kw in risk_keywords):
+            return QueryIntent.RISK
+        elif any(kw in query_lower for kw in compliance_keywords):
+            return QueryIntent.COMPLIANCE
+        elif any(kw in query_lower for kw in ["explain", "what is", "define", "meaning", "understand"]):
+            return QueryIntent.LEGAL
+        else:
+            return QueryIntent.GENERAL
+
+    def process_query(
+        self,
+        query: str,
+        conversation_history: Optional[List[Dict[str, str]]] = None
+    ) -> Dict[str, Any]:
+        intent = self.classify_intent(query)
+
+        print(f"Intent classified: {intent}")
+
+        legal_result = self.legal_agent.process(query)
+
+        if intent in [QueryIntent.RISK, QueryIntent.COMPLIANCE]:
+            context_results = self._get_context_results(legal_result)
+            risk_result = self.risk_agent.process(query, context_results)
+        else:
+            risk_result = {
+                "level": "low",
+                "severity_score": 0.0,
+                "penalties": [],
+                "mitigations": [],
+                "explanation": "No specific risk assessment requested"
+            }
+
+        context_results = self._get_context_results(legal_result)
+        citation_result = self.citation_validator.process(
+            legal_result["answer"],
+            context_results
+        )
+
+        final_answer = self._construct_final_answer(
+            legal_result["answer"],
+            citation_result
+        )
+
+        return {
+            "answer": final_answer,
+            "citations": self._format_citations(legal_result),
+            "risk_level": risk_result["level"],
+            "severity_score": risk_result["severity_score"],
+            "risk_details": {
+                "penalties": risk_result["penalties"],
+                "mitigations": risk_result["mitigations"]
+            },
+            "confidence": citation_result["confidence"],
+            "citation_validation": citation_result,
+            "intent": intent,
+            "sources": legal_result["sources"]
+        }
+
+    def _get_context_results(self, legal_result: Dict[str, Any]) -> List[RetrievalResult]:
+        from backend.retrieval.hybrid_retriever import RetrievalResult
+        results = []
+        for ctx in legal_result.get("context_used", []):
+            results.append(RetrievalResult(
+                chunk_id=ctx.get("chunk_id", ""),
+                text=ctx.get("text", ""),
+                source=ctx.get("source", ""),
+                document_type=ctx.get("document_type", ""),
+                section_number=ctx.get("section_number", ""),
+                page_number=ctx.get("page_number", 0),
+                score=ctx.get("score", 0.0),
+                rank=ctx.get("rank", 0)
+            ))
+        return results
+
+    def _construct_final_answer(self, answer: str, citation_result: Dict[str, Any]) -> str:
+        if not citation_result["is_valid"]:
+            warning = "\n\n⚠️ NOTE: Some citations in this response may not be fully verified. Please verify with a legal expert."
+            return answer + warning
+        return answer
+
+    def _format_citations(self, legal_result: Dict[str, Any]) -> List[Dict[str, Any]]:
+        citations = []
+        for ctx in legal_result.get("context_used", []):
+            citations.append({
+                "source": ctx.get("source", "unknown"),
+                "section": ctx.get("section_number", "N/A"),
+                "page": ctx.get("page_number", 0),
+                "text_preview": ctx.get("text", "")[:200]
+            })
+        return citations
+
+
+orchestrator = Orchestrator()
