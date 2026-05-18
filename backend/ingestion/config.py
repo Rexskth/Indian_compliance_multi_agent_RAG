@@ -18,7 +18,7 @@ class Config:
     BM25_WEIGHT: float = 0.3
 
     EMBED_MODEL: str = "nvidia/llama-nemotron-embed-vl-1b-v2:free"
-    LLM_MODEL: str = "openai/gpt-oss-120b:free"
+    LLM_MODEL: str = "baidu/cobuddy:free"
 
     OPENROUTER_API_KEY: Optional[str] = os.getenv("OPENROUTER_API_KEY")
 

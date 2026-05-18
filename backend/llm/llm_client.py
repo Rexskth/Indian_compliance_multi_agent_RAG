@@ -5,7 +5,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import os
 from typing import Optional, List, Dict, Any
+from dotenv import load_dotenv
 from backend.ingestion.config import config
+
+load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 
 class LLMClient:
