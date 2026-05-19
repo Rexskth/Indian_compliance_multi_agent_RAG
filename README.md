@@ -234,7 +234,7 @@ node node_modules/next/dist/bin/next dev -p 3000
 
 ---
 
-## 🎯 Demo Instructions (For Interviews & Presentations)
+## 🎯 Instructions to run & use it. 
 
 ### 🚀 Quick Run Commands
 
@@ -256,7 +256,7 @@ node node_modules/next/dist/bin/next dev -p 3000
 
 ### 🎤 Talking Points for Demos
 
-| # | Point | What to Say |
+| # | Point | Specifications |
 |---|-------|-------------|
 | 1 | **Multi-Agent Architecture** | "This system uses 3 specialized agents - Legal Agent for retrieval, Risk Agent for assessment, and Citation Validator to prevent hallucinations." |
 | 2 | **Hybrid Retrieval** | "We combine semantic vector search (70%) with keyword-based BM25 (30%) for accurate legal document retrieval." |
