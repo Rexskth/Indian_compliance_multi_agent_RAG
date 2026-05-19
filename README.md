@@ -234,6 +234,96 @@ node node_modules/next/dist/bin/next dev -p 3000
 
 ---
 
+## 🎯 Demo Instructions (For Interviews & Presentations)
+
+### 🚀 Quick Run Commands
+
+**Terminal 1 - Backend:**
+```bash
+cd /path/to/indian-compliance-rag-v1
+python3 run_backend.py
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd /path/to/indian-compliance-rag-v1/frontend
+node node_modules/next/dist/bin/next dev -p 3000
+```
+
+**Then open:** `http://localhost:3000`
+
+---
+
+### 🎤 Talking Points for Demos
+
+| # | Point | What to Say |
+|---|-------|-------------|
+| 1 | **Multi-Agent Architecture** | "This system uses 3 specialized agents - Legal Agent for retrieval, Risk Agent for assessment, and Citation Validator to prevent hallucinations." |
+| 2 | **Hybrid Retrieval** | "We combine semantic vector search (70%) with keyword-based BM25 (30%) for accurate legal document retrieval." |
+| 3 | **Citation-Grounded** | "Every response cites specific sections and pages from source documents - no fabricated legal claims." |
+| 4 | **Risk Assessment** | "The Risk Agent analyzes queries and provides severity scores, penalties, and mitigation steps." |
+
+---
+
+### 🧪 Test Queries for Demos
+
+| Query | Shows |
+|-------|-------|
+| "What are penalties for data breach under DPDPA?" | DPDPA penalties with amounts (₹250 crore) |
+| "What is punishment for unauthorized access under IT Act?" | IT Act Section 70 - 10 years imprisonment |
+| "What are board meeting requirements under Companies Act?" | Section 173 - 4 meetings/year, 120 days gap |
+| "What are legal risks of non-compliance?" | Risk assessment with penalties |
+
+---
+
+### 💡 Impressive Features to Highlight
+
+- ✅ **1,036 legal document chunks** from 3 Indian laws
+- ✅ **Zero hallucination** - all citations verified
+- ✅ **Input validation** - rejects empty/malicious queries
+- ✅ **Prompt injection protection** - redirects to legal context
+- ✅ **Non-English support** - handles Hinglish queries
+- ✅ **Dark/Light mode** - modern UI
+- ✅ **API-first design** - RESTful endpoints
+
+---
+
+### 🔗 Demo Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `http://localhost:3000` | Main UI |
+| `http://localhost:8000/api/health` | Health check |
+| `http://localhost:8000/docs` | Swagger API docs |
+
+---
+
+### ⚡ Quick Commands Reference
+
+| Action | Command |
+|--------|---------|
+| Start Backend | `python3 run_backend.py` |
+| Start Frontend | `node node_modules/next/dist/bin/next dev -p 3000` |
+| Stop Server | `Ctrl + C` |
+
+---
+
+### 🎬 Demo Flow
+
+1. **Open browser** to `http://localhost:3000`
+2. **Show the UI** - point out DPDPA, IT Act, Companies Act sections
+3. **Enter query** - "What are penalties for data breach under DPDPA?"
+4. **Point to citations** - show specific sections and pages
+5. **Show risk indicator** - explain severity assessment
+6. **Test another query** - "IT Act unauthorized access"
+7. **Open backend docs** - show API at `http://localhost:8000/docs`
+
+---
+
+**🎉 Your system is demo-ready!**
+
+---
+
 ## 📖 API Documentation
 
 ### Base URL
