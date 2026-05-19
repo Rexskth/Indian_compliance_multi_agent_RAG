@@ -570,12 +570,12 @@ CHUNK_OVERLAP=100
 
 ### 📋 Version 2 Roadmap
 
-| Phase | Feature | Timeline |
-|-------|---------|----------|
-| **V2.1** | Automated PDF fetching from MCA, MeitY | Q3 2025 |
-| **V2.2** | Email/SMS notification system for updates | Q4 2025 |
-| **V2.3** | Additional laws (SEBI, GST, RBI) | Q1 2026 |
-| **V2.4** | Multi-language support (Hindi + English) | Q2 2026 |
+| Phase | Feature |
+|-------|---------|
+| **V2.1** | Automated PDF fetching from MCA, MeitY |
+| **V2.2** | Email/SMS notification system for updates |
+| **V2.3** | Additional laws (SEBI, GST, RBI) |
+| **V2.4** | Multi-language support (Hindi + English) |
 
 ---
 
