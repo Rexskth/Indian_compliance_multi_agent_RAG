@@ -5,7 +5,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List, Dict
 from backend.agents.orchestrator import orchestrator
 from backend.ingestion.config import config
@@ -29,6 +29,15 @@ app.add_middleware(
 class QueryRequest(BaseModel):
     query: str
     conversation_history: Optional[List[Dict[str, str]]] = None
+
+    @field_validator('query')
+    @classmethod
+    def validate_query(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Query cannot be empty')
+        if len(v) > 2000:
+            raise ValueError('Query too long (max 2000 characters)')
+        return v.strip()
 
 
 class QueryResponse(BaseModel):

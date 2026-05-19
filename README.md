@@ -1,0 +1,414 @@
+# 🇮🇳 Indian Compliance Multi-Agent RAG System
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat&label=Version">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat">
+  <img src="https://img.shields.io/badge/Python-3.9+-orange?style=flat">
+  <img src="https://img.shields.io/badge/Next.js-14-purple?style=flat">
+</p>
+
+> A production-grade Retrieval Augmented Generation (RAG) system for Indian legal compliance - covering DPDPA 2023, IT Act 2000, and Companies Act 2013.
+
+---
+
+## 📋 Table of Contents
+
+1. [Overview](#-overview)
+2. [Architecture](#-architecture)
+3. [Features](#-features)
+4. [Tech Stack](#-tech-stack)
+5. [Project Structure](#-project-structure)
+6. [Quick Start](#-quick-start)
+7. [API Documentation](#-api-documentation)
+8. [Testing](#-testing)
+9. [Security](#-security)
+10. [Configuration](#-configuration)
+
+---
+
+## 🎯 Overview
+
+This system helps startups and businesses understand Indian laws through:
+
+- **Multi-Agent Orchestration** - Legal, Risk, and Citation agents working together
+- **Hybrid Retrieval** - Combining vector (70%) + BM25 (30%) search
+- **Citation-Grounded Responses** - Every claim backed by source documents
+- **Risk Assessment** - Evaluates penalties and compliance risks
+- **Zero Hallucination** - Prevents fabricated legal citations
+
+---
+
+## 🏗 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (Next.js 14)                    │
+│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐  │
+│  │   Chat UI   │  │  Citations   │  │    Risk Indicators     │  │
+│  └─────────────┘  └──────────────┘  └─────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ HTTP
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    FASTAPI BACKEND (Port 8000)                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                  ORCHESTRATOR AGENT                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │   │
+│  │  │  Legal      │  │  Risk       │  │  Citation       │   │   │
+│  │  │  Agent      │  │  Agent      │  │  Validator      │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────────┘   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                             │                                  │
+│                             ▼                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              HYBRID RETRIEVAL ENGINE                      │   │
+│  │  ┌───────────────────┐    ┌────────────────────────────┐   │   │
+│  │  │  Vector Search    │ +  │  BM25 Keyword Search       │   │   │
+│  │  │  (70% weight)     │    │  (30% weight)              │   │   │
+│  │  └───────────────────┘    └────────────────────────────┘   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     CHROMADB VECTOR STORE                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  1,036 Legal Document Chunks (384-dimensional embeddings)│   │
+│  │  Sources: DPDPA 2023 | IT Act 2000 | Companies Act 2013    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ✨ Features
+
+### Core Features
+| Feature | Description |
+|---------|-------------|
+| **Multi-Agent System** | Legal Agent (retrieval), Risk Agent (assessment), Citation Validator |
+| **Hybrid Retrieval** | Vector + BM25 with intelligent re-ranking |
+| **Citation Ground** | Every response cites specific sections, pages |
+| **Risk Assessment** | Evaluates penalties, severity, and provides mitigations |
+| **Intent Classification** | Auto-detects if query is legal, risk, or compliance-related |
+
+### Technical Features
+- ✅ Semantic chunking (512 tokens, 100 overlap)
+- ✅ Metadata filtering by source, section, page
+- ✅ Input validation (empty/long query rejection)
+- ✅ Prompt injection protection
+- ✅ Non-English query support
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS, Framer Motion |
+| **Backend** | Python 3.9+, FastAPI, Pydantic |
+| **RAG Engine** | LangChain, ChromaDB, BM25, Sentence Transformers |
+| **LLM** | Baidu Cobuddy (via OpenRouter) |
+| **Vector DB** | ChromaDB (persistent, local) |
+
+---
+
+## 📁 Project Structure
+
+```
+indian-compliance-rag-v1/
+│
+├── 📦 frontend/                 # Next.js 14 frontend
+│   ├── src/
+│   │   ├── app/               # App router pages
+│   │   ├── components/        # React components
+│   │   ├── lib/               # API utilities
+│   │   └── types/            # TypeScript types
+│   └── package.json
+│
+├── 🐍 backend/                 # FastAPI backend
+│   ├── ingestion/             # PDF parsing & chunking
+│   │   ├── config.py          # Configuration
+│   │   ├── document_parser.py
+│   │   ├── chunker.py
+│   │   ├── embedding_pipeline.py
+│   │   └── vector_store.py
+│   │
+│   ├── retrieval/             # Hybrid RAG engine
+│   │   ├── hybrid_retriever.py
+│   │   └── bm25_retriever.py
+│   │
+│   ├── agents/                # Multi-agent system
+│   │   ├── legal_agent.py
+│   │   ├── risk_agent.py
+│   │   ├── citation_validator.py
+│   │   └── orchestrator.py
+│   │
+│   ├── llm/                   # LLM integration
+│   │   └── llm_client.py
+│   │
+│   ├── main.py               # FastAPI app
+│   └── run_backend.py        # Server runner
+│
+├── 📄 chroma_db/              # Vector database storage
+├── 📄 .env                    # Environment variables
+├── 📄 .gitignore
+├── 📄 requirements.txt
+└── 📄 README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+```bash
+Python 3.9+    # Check: python3 --version
+Node.js 18+    # Check: node --version
+```
+
+### 1. Clone & Install
+
+```bash
+# Clone repository
+cd indian-compliance-rag-v1
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Install frontend dependencies
+cd frontend && npm install && cd ..
+```
+
+### 2. Environment Setup
+
+```bash
+# Create .env file
+cp .env.example .env
+
+# Edit .env and add your OpenRouter API key
+# Get free key at: https://openrouter.ai/
+OPENROUTER_API_KEY=your_api_key_here
+```
+
+### 3. Data Ingestion (First Time Only)
+
+```bash
+python3 backend/ingestion/ingest.py
+```
+
+**Expected Output:**
+```
+============================================================
+PHASE 1: DATA INGESTION PIPELINE
+============================================================
+
+[1/5] Getting PDF files...
+Found 3 PDFs: ['Companies_Act_2013.pdf', 'DPDPA_act_2023.pdf', 'IT_Act_2000.pdf']
+
+[2/5] Parsing PDFs...
+Parsed: Companies_Act_2013.pdf -> 370 pages
+[...]
+
+INGESTION COMPLETE
+Documents processed: 3
+Pages extracted: 431
+Chunks created: 1036
+```
+
+### 4. Start Backend
+
+```bash
+python3 run_backend.py
+# API available at: http://localhost:8000
+# Docs at: http://localhost:8000/docs
+```
+
+### 5. Start Frontend
+
+```bash
+cd frontend
+node node_modules/next/dist/bin/next dev -p 3000
+# Open: http://localhost:3000
+```
+
+---
+
+## 📖 API Documentation
+
+### Base URL
+```
+http://localhost:8000
+```
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/health` | System health check |
+| `POST` | `/api/query` | Submit legal query |
+| `GET` | `/api/metrics` | System configuration |
+
+---
+
+### 🔍 /api/query
+
+**Request:**
+```json
+{
+  "query": "What are penalties for data breach under DPDPA?",
+  "conversation_history": []
+}
+```
+
+**Response:**
+```json
+{
+  "answer": "Based on the provided legal context...",
+  "citations": [
+    {
+      "source": "dpdpa_2023",
+      "section": "Section 33",
+      "page": 20,
+      "text_preview": "Penalties for data breach..."
+    }
+  ],
+  "risk_level": "low",
+  "severity_score": 2.0,
+  "risk_details": {
+    "penalties": ["₹250 crore maximum"],
+    "mitigations": ["Implement security safeguards"]
+  },
+  "confidence": 0.95,
+  "intent": "risk",
+  "sources": ["dpdpa_2023"]
+}
+```
+
+---
+
+### 💚 /api/health
+
+```bash
+curl http://localhost:8000/api/health
+```
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "version": "1.0.0",
+  "collection_count": 1036
+}
+```
+
+---
+
+## 🧪 Testing
+
+### Test Queries
+
+| Category | Query |
+|----------|-------|
+| **DPDPA** | "What are penalties for data breach under DPDPA?" |
+| **IT Act** | "What is penalty for unauthorized access?" |
+| **Companies** | "What are board meeting requirements?" |
+| **Risk** | "What are legal risks of non-compliance?" |
+
+### Run Tests
+
+```bash
+# Backend tests
+cd backend
+
+# Test retrieval
+python3 retrieval/test_retrieval.py
+
+# Test agents
+python3 agents/test_agents.py
+```
+
+---
+
+## 🔒 Security
+
+### Implemented Safeguards
+
+| Feature | Protection |
+|---------|------------|
+| **Input Validation** | Rejects empty/long queries (max 2000 chars) |
+| **Prompt Injection** | LLM naturally redirects to legal context |
+| **API Key Safety** | Keys stored in .env, never exposed in responses |
+| **No Hallucination** | All responses cite actual document sections |
+| **Fallback Mode** | Works without API key (retrieval only) |
+
+### Environment Variables
+
+```bash
+# Required
+OPENROUTER_API_KEY=sk-or-v1-xxxxx  # Get from openrouter.ai
+
+# Optional (defaults provided)
+VECTOR_WEIGHT=0.7
+BM25_WEIGHT=0.3
+TOP_K=7
+CHUNK_SIZE=512
+CHUNK_OVERLAP=100
+```
+
+---
+
+## ⚙️ Configuration
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `VECTOR_WEIGHT` | 0.7 | Vector search weight (70%) |
+| `BM25_WEIGHT` | 0.3 | BM25 keyword weight (30%) |
+| `TOP_K` | 7 | Number of results to retrieve |
+| `CHUNK_SIZE` | 512 | Tokens per chunk |
+| `CHUNK_OVERLAP` | 100 | Token overlap between chunks |
+
+---
+
+## 📊 System Performance
+
+| Metric | Value |
+|--------|-------|
+| Documents Indexed | 1,036 chunks |
+| Source Documents | 3 (DPDPA, IT Act, Companies Act) |
+| Pages Processed | 431 |
+| Embedding Dimension | 384 |
+| Response Time | < 5 seconds |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [LangChain](https://langchain.com/) - RAG framework
+- [ChromaDB](https://www.trychroma.com/) - Vector database
+- [OpenRouter](https://openrouter.ai/) - LLM API
+- [Next.js](https://nextjs.org/) - Frontend framework
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ for Indian Legal Compliance</strong>
+  <br>
+  <sub>Indian Compliance Multi-Agent RAG System v1.0</sub>
+</p>
