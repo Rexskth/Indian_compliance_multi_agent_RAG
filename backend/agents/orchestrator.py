@@ -8,6 +8,7 @@ from backend.agents.legal_agent import LegalAgent
 from backend.agents.risk_agent import RiskAgent
 from backend.agents.citation_validator import CitationValidator
 from backend.retrieval.hybrid_retriever import RetrievalResult
+from backend.utils.cache import two_layer_cache
 
 
 class QueryIntent:
@@ -22,6 +23,8 @@ class Orchestrator:
         self.legal_agent = LegalAgent()
         self.risk_agent = RiskAgent()
         self.citation_validator = CitationValidator()
+        self.cache = two_layer_cache
+        self.use_cache = True
 
     def classify_intent(self, query: str) -> str:
         query_lower = query.lower()
@@ -43,6 +46,19 @@ class Orchestrator:
         query: str,
         conversation_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict[str, Any]:
+        if self.use_cache:
+            cached_response, cache_source = self.cache.get(query)
+            if cached_response:
+                if cache_source == "response_cache":
+                    print(f"⚡ Returning from RESPONSE CACHE (instant)")
+                    cached_response['cache_hit'] = True
+                    cached_response['cache_type'] = 'response'
+                    return cached_response
+                elif cache_source == "document_cache":
+                    print(f"⚡ Returning from DOCUMENT CACHE (fast)")
+                    cached_response['cache_hit'] = True
+                    cached_response['cache_type'] = 'documents'
+        
         intent = self.classify_intent(query)
 
         print(f"Intent classified: {intent}")
@@ -72,7 +88,7 @@ class Orchestrator:
             citation_result
         )
 
-        return {
+        result = {
             "answer": final_answer,
             "citations": self._format_citations(legal_result),
             "risk_level": risk_result["level"],
@@ -84,8 +100,15 @@ class Orchestrator:
             "confidence": citation_result["confidence"],
             "citation_validation": citation_result,
             "intent": intent,
-            "sources": legal_result["sources"]
+            "sources": legal_result["sources"],
+            "cache_hit": False,
+            "cache_type": None
         }
+
+        if self.use_cache:
+            self.cache.cache_response(query, result)
+
+        return result
 
     def _get_context_results(self, legal_result: Dict[str, Any]) -> List[RetrievalResult]:
         from backend.retrieval.hybrid_retriever import RetrievalResult
