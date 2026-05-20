@@ -5,8 +5,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Generator
+import json
+import asyncio
 from backend.agents.orchestrator import orchestrator
 from backend.ingestion.config import config
 
@@ -91,6 +94,25 @@ async def query(request: QueryRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def generate_sse(query: str, conversation_history: Optional[List[Dict[str, str]]] = None) -> Generator[str, None, None]:
+    for stage_data in orchestrator.process_query_streaming(query, conversation_history):
+        yield f"data: {json.dumps(stage_data)}\n\n"
+        await asyncio.sleep(0.1)
+
+
+@app.post("/api/query/stream")
+async def query_stream(request: QueryRequest):
+    return StreamingResponse(
+        generate_sse(request.query, request.conversation_history),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
 
 
 @app.get("/api/metrics")
