@@ -207,6 +207,7 @@ class Orchestrator:
                 text=ctx.get("text", ""),
                 source=ctx.get("source", ""),
                 document_type=ctx.get("document_type", ""),
+                document_name=ctx.get("document_name", ""),
                 section_number=ctx.get("section_number", ""),
                 page_number=ctx.get("page_number", 0),
                 score=ctx.get("score", 0.0),
@@ -225,6 +226,7 @@ class Orchestrator:
         for ctx in legal_result.get("context_used", []):
             citations.append({
                 "source": ctx.get("source", "unknown"),
+                "document_name": ctx.get("document_name", ""),
                 "section": ctx.get("section_number", "N/A"),
                 "page": ctx.get("page_number", 0),
                 "text_preview": ctx.get("text", "")[:200]

@@ -9,6 +9,7 @@ import re
 class DocumentMetadata:
     source: str
     document_type: str
+    document_name: str = ""
     section_number: Optional[str] = None
     effective_date: Optional[str] = None
     last_verified: str = "2025-01-01"
@@ -51,16 +52,22 @@ class DocumentParser:
                 return match.group(0)
         return None
 
+    DOCUMENT_NAME_MAP = {
+        "dpdpa_2023": "DPDPA Act 2023",
+        "it_act_2000": "Information Technology Act 2000",
+        "companies_act_2013": "Companies Act 2013"
+    }
+
     def parse_pdf(self, pdf_path: Path) -> ParsedDocument:
         filename = pdf_path.name
-        doc_key = filename.replace(".pdf", "").replace("The_", "").replace("_", " ").strip()
 
         doc_type_map = {
-            "DPDPA_act_2023": "dpdpa_2023",
-            "The_Information_Technology_Act_2000": "it_act_2000",
-            "Companies_Act_2013": "companies_act_2013"
+            "DPDPA_act_2023.pdf": "dpdpa_2023",
+            "The_Information_Technology_Act_2000.pdf": "it_act_2000",
+            "Companies_Act_2013.pdf": "companies_act_2013"
         }
-        doc_id = doc_type_map.get(filename, "unknown")
+        doc_id = doc_type_map.get(filename, filename.replace(".pdf", "").lower().replace(" ", "_"))
+        document_name = self.DOCUMENT_NAME_MAP.get(doc_id, doc_id.replace("_", " ").title())
 
         parsed_doc = ParsedDocument(filename=filename)
 
@@ -75,6 +82,7 @@ class DocumentParser:
                 metadata = DocumentMetadata(
                     source=doc_id,
                     document_type=self.DOCUMENT_TYPE_MAP.get(doc_id, "act"),
+                    document_name=document_name,
                     section_number=section_number,
                     page_number=page_num
                 )

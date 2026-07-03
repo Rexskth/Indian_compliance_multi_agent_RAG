@@ -44,6 +44,7 @@ class VectorStore:
             {
                 "source": chunk.source,
                 "document_type": chunk.document_type,
+                "document_name": chunk.document_name,
                 "section_number": chunk.section_number or "",
                 "page_number": chunk.page_number,
                 "effective_date": chunk.effective_date or "",

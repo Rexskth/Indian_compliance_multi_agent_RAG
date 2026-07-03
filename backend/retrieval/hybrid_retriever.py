@@ -18,6 +18,7 @@ class RetrievalResult:
         text: str,
         source: str,
         document_type: str,
+        document_name: str,
         section_number: str,
         page_number: int,
         score: float,
@@ -27,6 +28,7 @@ class RetrievalResult:
         self.text = text
         self.source = source
         self.document_type = document_type
+        self.document_name = document_name
         self.section_number = section_number
         self.page_number = page_number
         self.score = score
@@ -38,6 +40,7 @@ class RetrievalResult:
             "text": self.text,
             "source": self.source,
             "document_type": self.document_type,
+            "document_name": self.document_name,
             "section_number": self.section_number,
             "page_number": self.page_number,
             "score": round(self.score, 4),
@@ -131,6 +134,7 @@ class HybridRetriever:
                 text=retrieved["documents"][idx],
                 source=metadata.get("source", ""),
                 document_type=metadata.get("document_type", ""),
+                document_name=metadata.get("document_name", ""),
                 section_number=metadata.get("section_number", ""),
                 page_number=metadata.get("page_number", 0),
                 score=score,

@@ -176,25 +176,6 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
 
                 {message.role === "assistant" && (
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    {message.risk_level && (
-                      <div className="flex items-center gap-2 mb-2">
-                        <span
-                          className={cn(
-                            "w-2 h-2 rounded-full",
-                            getRiskColor(message.risk_level)
-                          )}
-                        />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {getRiskLabel(message.risk_level)}
-                        </span>
-                        {message.confidence && (
-                          <span className="text-xs text-gray-500 dark:text-gray-500">
-                            ({Math.round(message.confidence * 100)}% confidence)
-                          </span>
-                        )}
-                      </div>
-                    )}
-
                     {message.citations && message.citations.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -205,8 +186,10 @@ export function ChatInterface({ className }: ChatInterfaceProps) {
                             key={idx}
                             className="text-xs bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700"
                           >
-                            <span className="font-medium">{citation.source}</span>
-                            {citation.section !== "N/A" && (
+                            <span className="font-medium">
+                              {citation.document_name || citation.source}
+                            </span>
+                            {citation.section && citation.section !== "N/A" && (
                               <span> - {citation.section}</span>
                             )}
                             <span className="text-gray-500"> (p.{citation.page})</span>

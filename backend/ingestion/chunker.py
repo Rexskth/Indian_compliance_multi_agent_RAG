@@ -10,6 +10,7 @@ class TextChunk:
     text: str
     source: str
     document_type: str
+    document_name: str
     section_number: Optional[str]
     page_number: int
     effective_date: Optional[str] = None
@@ -50,6 +51,7 @@ class SemanticChunker:
                     text=chunk_text,
                     source=page.metadata.source,
                     document_type=page.metadata.document_type,
+                    document_name=page.metadata.document_name,
                     section_number=page.metadata.section_number,
                     page_number=page.page_number,
                     effective_date=page.metadata.effective_date,
@@ -74,6 +76,7 @@ class SemanticChunker:
                 text=chunk_text,
                 source=page.metadata.source,
                 document_type=page.metadata.document_type,
+                document_name=page.metadata.document_name,
                 section_number=page.metadata.section_number,
                 page_number=page.page_number,
                 effective_date=page.metadata.effective_date,

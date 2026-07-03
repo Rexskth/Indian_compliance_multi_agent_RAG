@@ -149,7 +149,7 @@ This system helps startups and businesses understand Indian laws through:
 |---------|-------------|
 | **Multi-Agent System** | Legal Agent (retrieval), Risk Agent (assessment), Citation Validator |
 | **Hybrid Retrieval** | Vector + BM25 with intelligent re-ranking |
-| **Citation Ground** | Every response cites specific sections, pages |
+| **Citation Ground** | Every response cites specific sections, pages, and document names |
 | **Risk Assessment** | Evaluates penalties, severity, and provides mitigations |
 | **Intent Classification** | Auto-detects if query is legal, risk, or compliance-related |
 
@@ -170,7 +170,7 @@ This system helps startups and businesses understand Indian laws through:
 | **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS, Framer Motion |
 | **Backend** | Python 3.9+, FastAPI, Pydantic |
 | **RAG Engine** | LangChain, ChromaDB, BM25, Sentence Transformers |
-| **LLM** | Baidu Cobuddy (via OpenRouter) |
+| **LLM** | Liquid LFM 2.5 1.2B (via OpenRouter, free) |
 | **Vector DB** | ChromaDB (persistent, local) |
 
 ---
@@ -322,7 +322,7 @@ node node_modules/next/dist/bin/next dev -p 3000
 |---|-------|-------------|
 | 1 | **Multi-Agent Architecture** | "This system uses 3 specialized agents - Legal Agent for retrieval, Risk Agent for assessment, and Citation Validator to prevent hallucinations." |
 | 2 | **Hybrid Retrieval** | "We combine semantic vector search (70%) with keyword-based BM25 (30%) for accurate legal document retrieval." |
-| 3 | **Citation-Grounded** | "Every response cites specific sections and pages from source documents - no fabricated legal claims." |
+| 3 | **Citation-Grounded** | "Every response cites specific document names, sections, and pages from source documents - no fabricated legal claims." |
 | 4 | **Risk Assessment** | "The Risk Agent analyzes queries and provides severity scores, penalties, and mitigation steps." |
 
 ---
@@ -375,10 +375,9 @@ node node_modules/next/dist/bin/next dev -p 3000
 1. **Open browser** to `http://localhost:3000`
 2. **Show the UI** - point out DPDPA, IT Act, Companies Act sections
 3. **Enter query** - "What are penalties for data breach under DPDPA?"
-4. **Point to citations** - show specific sections and pages
-5. **Show risk indicator** - explain severity assessment
-6. **Test another query** - "IT Act unauthorized access"
-7. **Open backend docs** - show API at `http://localhost:8000/docs`
+4. **Point to citations** - show specific document names, sections, and pages
+5. **Test another query** - "IT Act unauthorized access"
+6. **Open backend docs** - show API at `http://localhost:8000/docs`
 
 ---
 
@@ -420,6 +419,7 @@ http://localhost:8000
   "citations": [
     {
       "source": "dpdpa_2023",
+      "document_name": "DPDPA Act 2023",
       "section": "Section 33",
       "page": 20,
       "text_preview": "Penalties for data breach..."
@@ -433,7 +433,7 @@ http://localhost:8000
   },
   "confidence": 0.95,
   "intent": "risk",
-  "sources": ["dpdpa_2023"]
+  "sources": ["DPDPA Act 2023"]
 }
 ```
 

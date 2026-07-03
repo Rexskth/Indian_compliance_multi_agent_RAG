@@ -45,7 +45,7 @@ Provide a clear, accurate answer with proper citations. Format citations as [Sou
         return {
             "answer": answer,
             "context_used": [r.to_dict() for r in context_results],
-            "sources": list(set([r.source for r in context_results if r.source]))
+            "sources": list(set([r.document_name or r.source for r in context_results if r.document_name or r.source]))
         }
 
     def _build_fallback_answer(self, query: str, context_text: str) -> str:
@@ -66,9 +66,10 @@ The system retrieved {7} relevant legal sections that may contain information re
     def _build_context(self, results: List[RetrievalResult]) -> str:
         context_parts = []
         for r in results:
+            doc_name = r.document_name or r.source.upper()
             section_info = f"Section: {r.section_number}" if r.section_number else "Section: N/A"
             context_parts.append(
-                f"[{r.source.upper()}, {section_info}, Page {r.page_number}]\n{r.text}\n"
+                f"[{doc_name}, {section_info}, Page {r.page_number}]\n{r.text}\n"
             )
         return "\n".join(context_parts)
 

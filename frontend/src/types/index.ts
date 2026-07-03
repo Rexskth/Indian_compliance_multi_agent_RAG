@@ -21,6 +21,7 @@ export interface QueryResponse {
 
 export interface Citation {
   source: string;
+  document_name: string;
   section: string;
   page: number;
   text_preview: string;
