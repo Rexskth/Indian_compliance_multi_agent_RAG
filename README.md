@@ -302,14 +302,13 @@ node node_modules/next/dist/bin/next dev -p 3000
 
 **Terminal 1 - Backend:**
 ```bash
-cd /path/to/indian-compliance-rag-v1
 python3 run_backend.py
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
-cd /path/to/indian-compliance-rag-v1/frontend
-node node_modules/next/dist/bin/next dev -p 3000
+cd frontend
+npm run dev
 ```
 
 **Then open:** `http://localhost:3000`
